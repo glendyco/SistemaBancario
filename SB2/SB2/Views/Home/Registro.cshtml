@@ -1,0 +1,58 @@
+﻿@{
+    ViewBag.Title = "Registro";
+    ViewBag.aviso = "Ingrese todos los datos correctamente para registrarse en el sistema";
+}
+<h3>@ViewBag.Message</h3>
+
+
+
+
+<div class="row">
+
+    <div class="alert alert-info">
+        <a class="close" data-dismiss="alert" href="#">&times;</a>
+        @ViewBag.aviso
+
+        @if (ViewData["MensajeError"] != null)
+        {
+            @ViewData["MensajeError"];
+        }
+        else
+        {
+            @ViewBag.aviso2
+        }
+    </div>
+
+    @using (Html.BeginForm("RegistroUsuario", "Home", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+
+        <h1>Registro</h1>
+        <div class="form-group">
+            <input class="form-control" type="number" name="dpi" placeholder="DPI"  pattern=".{10,13}" required>
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="email" name="correo" placeholder="correo electrónico" required>
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="text" name="nombre" placeholder="Nombre Completo" required>
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="text" name="usuario" placeholder="Username" pattern="(?=.*\d)(?=.*[a-zA-z]).{5,12}" required>
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="password" name="pass" pattern="(?=.*\d)(?=.*[A-Z]).{8,}" placeholder="Contraseña" required>
+        </div>
+
+        <button class="btn btn-lg btn-primary" type="submit"> REGISTRARME </button>
+    }
+
+
+
+
+
+</div>
+
+
+
