@@ -24,5 +24,28 @@ namespace SB2.Tests.Models
             Assert.IsNotNull(result);
          
         }
+
+
+        [TestMethod]
+        public void Registro()
+        {
+            string user = "Vigo4";
+            string dpi = "123456799";
+            string nombre = "Vigoberto Menchú";
+            string correo = "vigo@gmail.com";
+            string pass = "SoyunaPrueb4";
+
+            int registrado = 1;
+
+            // Arrange
+            Consulta controller = new Consulta();
+
+            // Act
+            int result = controller.Registro(dpi,nombre,correo,user,pass);
+
+            // Assert
+            Assert.AreEqual(registrado,result);
+
+        }
     }
 }
