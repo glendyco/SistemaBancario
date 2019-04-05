@@ -41,5 +41,38 @@ namespace SB2.Models
             return logged_usr;
             
         }
+
+
+        public int Registro (string dpi, string nombre, string correo, string username, string pass)
+        {
+            // devuelve 1 si el registro es exitoso
+            // devuelve -1 en caso de fallo
+            
+
+            string conexion = "server=remotemysql.com;database=jOXtL7Pjql;uid=jOXtL7Pjql;pwd=ecjOPpQQ8e;";
+            MySqlConnection conn = new MySqlConnection(conexion);
+            conn.Open();
+
+            string query = "INSERT INTO USUARIO(id_usuario,DPI, nombre, username, email, contrasena) " +
+                "VALUES (@userid, @userdpi, @username,@usernick, @useremail, @userpass)";
+
+            
+
+            MySqlCommand mycomand = new MySqlCommand(query, conn);
+            mycomand.Parameters.AddWithValue("@usernick", username);
+            mycomand.Parameters.AddWithValue("@userid", dpi);
+            mycomand.Parameters.AddWithValue("@userdpi", dpi);
+            mycomand.Parameters.AddWithValue("@username", nombre);
+            mycomand.Parameters.AddWithValue("@useremail", correo);
+            mycomand.Parameters.AddWithValue("@userpass", pass);
+
+            int rowsaffected= mycomand.ExecuteNonQuery();
+
+            conn.Close();
+            return rowsaffected;
+
+        }
+
+
     }
 }

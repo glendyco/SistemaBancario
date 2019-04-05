@@ -1,33 +1,49 @@
 ﻿@{
-    ViewBag.Title = "About";
+    ViewBag.Title = "Inicio de esion";
 }
-<h2>@ViewBag.Title.</h2>
-<h3>@ViewBag.Message</h3>
 
-<p>Use this area to provide additional information.</p>
+<h3>@ViewBag.Message</h3>
 
 
 @{
-    ViewBag.Title = "Signup Page";
+ 
+    ViewBag.aviso = "Inicie sesión ingresando su nombre de usuario, número de Usuario y Contraseña\n";
+
+    ViewBag.aviso2= "Presione Enter o haga click en el boton 'INICIAR SESION'";
+
 
 }
 
 <div class="row">
+
     <div class="alert alert-info">
         <a class="close" data-dismiss="alert" href="#">&times;</a>
-        Press enter key or click the Submit button
+        @ViewBag.aviso
+
+        @if (ViewData["MensajeError"] != null)
+        {
+            @ViewData["MensajeError"];
+        }
+        else
+        {
+            @ViewBag.aviso2
+        }
     </div>
+
     @using (Html.BeginForm("Autenticacion", "Home", FormMethod.Post))
     {
         @Html.AntiForgeryToken()
         @Html.ValidationSummary(true)
 
-        <h1>Login</h1>
+        <h1>Iniciar Sesion</h1>
         <div class="form-group">
-            <input class="form-control" type="text" name="nick" placeholder="UserName">
+            <input class="form-control" type="number" name="code" placeholder="Codigo de Usuario">
         </div>
         <div class="form-group">
-            <input class="form-control" type="password" name="password" placeholder="Password">
+            <input class="form-control" type="text" name="nick" placeholder="Username">
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="password" name="password" placeholder="Contraseña">
         </div>
         <div class="form-group">
             <label>
@@ -35,16 +51,17 @@
                 Remember me
             </label>
         </div>
-        <button class="btn btn-lg btn-primary" type="submit"> INGRESAR </button>
+        <button class="btn btn-lg btn-primary" type="submit"> INICIAR SESION </button> <BR><BR><BR>
     }
 
-
-    @using (Html.BeginForm("Autenticacion", "Home", FormMethod.Post))  
+    @using (Html.BeginForm("Registro", "Home", FormMethod.Post))
     {
-       <input type="text" name="nick" id="nick" />
-        <input type="password" name="password" id="password" />
-        <input type="submit" value="Login" />
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+        <button class="btn btn-lg btn-primary" type="submit"> REGISTRARSE </button>
     }
+
+
 
 </div>
 
