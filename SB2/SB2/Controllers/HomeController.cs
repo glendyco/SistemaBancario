@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using MySql.Data.MySqlClient;
 
+
 namespace SB2.Controllers
 {
     public class HomeController : Controller
@@ -28,6 +29,31 @@ namespace SB2.Controllers
             return View();
         }
 
+        public ActionResult Login()
+        {
+            ViewBag.Message = "Your contact page.";
+
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Autenticacion(string nick, string password)
+        {
+            Console.WriteLine("autenticando nick, pwd " + nick + "," + password);
+            Models.Consulta consulta = new Models.Consulta();
+            Models.Usuario usuario_logeado = consulta.Login(nick, password);
+
+       
+            if (usuario_logeado != null) {
+                Console.WriteLine("USUARIO LOGUEADO ES NULO");
+                return View("UserProfile", usuario_logeado);
+            }
+
+            return View("Login");
+
+            
+        }
+
 
         public String Metodo()
         {
@@ -44,9 +70,11 @@ namespace SB2.Controllers
             }
             catch (Exception ex)
             {
-                resultado = "Can not open connection ! ";
+                resultado = "Can not open connection !, Exception: "+ ex.Message; ;
             }
             return resultado;
         }
+        
+
     }
 }

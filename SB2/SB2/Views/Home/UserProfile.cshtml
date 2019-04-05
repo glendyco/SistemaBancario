@@ -1,0 +1,18 @@
+﻿
+@model SB2.Models.Usuario
+
+@{
+
+    ViewBag.Title = "Perfil de Usuario";
+
+    string user_nick = Model.username;
+    string user_name = Model.nombre;
+
+}
+<h2>@ViewBag.Title.</h2>
+<h3>Bienvenido @user_name </h3>
+<h3> Username: @user_nick </h3>
+
+<p>Sesion iniciada.</p>
+
+
