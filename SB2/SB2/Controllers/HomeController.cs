@@ -62,6 +62,29 @@ namespace SB2.Controllers
         }
 
 
+        [HttpPost]
+        public ActionResult SolicitarCredito(string monto, string descripcion, string cuenta)
+        {
+
+            Models.Consulta consulta = new Models.Consulta();
+         
+            int resultadoRegistro = consulta.SolicitarCredito(monto, descripcion, cuenta);
+
+
+            if (resultadoRegistro == 1)
+            {
+                Console.WriteLine("CREDITO EN PROCESO");
+                return View("UserProfile",(Models.Usuario) Session["LoggedUser"] );
+            }
+            else
+            {
+                ViewData["MensajeError"] = "Error en Registro";
+                return View("UserProfile", (Models.Usuario)Session["LoggedUser"]);
+            }
+
+        }
+
+
 
         [HttpPost]
         public ActionResult Autenticacion(string nick, string password)
@@ -73,7 +96,9 @@ namespace SB2.Controllers
 
             if (usuario_logeado != null)
             {
-                Console.WriteLine("USUARIO LOGUEADO ES NULO");
+                // Console.WriteLine("USUARIO LOGUEADO ES NULO");
+                
+                Session["LoggedUser"] = usuario_logeado;
                 return View("UserProfile", usuario_logeado);
             }
 
