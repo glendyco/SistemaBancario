@@ -85,6 +85,51 @@ namespace SB2.Controllers
         }
 
 
+        [HttpPost]
+        public ActionResult AprobarCredito(string id_Solicitud)
+        {
+
+            Models.Consulta consulta = new Models.Consulta();
+
+            int resultadoRegistro = consulta.AprobarCredito(id_Solicitud);
+
+
+            if (resultadoRegistro == 1)
+            {
+                
+                return View("UserProfile", (Models.Usuario)Session["LoggedUser"]);
+            }
+            else
+            {
+               
+                return View("UserProfile", (Models.Usuario)Session["LoggedUser"]);
+            }
+
+        }
+
+        [HttpPost]
+        public ActionResult RechazarCredito(string id_Solicitud)
+        {
+
+            Models.Consulta consulta = new Models.Consulta();
+
+            int resultadoRegistro = consulta.RechazarCredito(id_Solicitud);
+
+
+            if (resultadoRegistro == 1)
+            {
+
+                return View("UserProfile", (Models.Usuario)Session["LoggedUser"]);
+            }
+            else
+            {
+
+                return View("UserProfile", (Models.Usuario)Session["LoggedUser"]);
+            }
+
+        }
+
+
 
         [HttpPost]
         public ActionResult Autenticacion(string nick, string password)
@@ -99,6 +144,7 @@ namespace SB2.Controllers
                 // Console.WriteLine("USUARIO LOGUEADO ES NULO");
                 
                 Session["LoggedUser"] = usuario_logeado;
+                Session["SolicitudesC"] = consulta.VerSolicitudesCredito();
                 return View("UserProfile", usuario_logeado);
             }
 

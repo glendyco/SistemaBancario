@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+
 using System.Linq;
 using System.Web;
 using MySql.Data.MySqlClient;
@@ -102,5 +104,82 @@ namespace SB2.Models
 
         }
 
+        public List<SolicitudC> VerSolicitudesCredito()
+        {
+        
+
+            string conexion = "server=remotemysql.com;database=jOXtL7Pjql;uid=jOXtL7Pjql;pwd=ecjOPpQQ8e;";
+            MySqlConnection conn = new MySqlConnection(conexion);
+            conn.Open();
+
+            string query = "SELECT * FROM CREDITO where estado = 'Pendiente' ";
+
+
+            MySqlCommand mycomand = new MySqlCommand(query, conn);
+
+            MySqlDataReader myreader = mycomand.ExecuteReader();
+            List<SolicitudC> Lista = new List<SolicitudC>();
+            while (myreader.Read())
+            {
+                SolicitudC solic = new SolicitudC();
+                solic.cuenta = myreader["id_cuenta"].ToString();
+                solic.descripcion = myreader["descripcion"].ToString();
+                solic.monto = myreader["monto"].ToString();
+                solic.id = myreader["id_credito"].ToString();
+                Lista.Add(solic);
+
+                //string usr_nick = myreader["username"].ToString();
+                Console.WriteLine(myreader["descripcion"].ToString());
+
+
+            }
+            myreader.Close();
+            conn.Close();
+            return Lista;
+
+        }
+
+
+        public int AprobarCredito(string id)
+        {
+
+
+            string conexion = "server=remotemysql.com;database=jOXtL7Pjql;uid=jOXtL7Pjql;pwd=ecjOPpQQ8e;";
+            MySqlConnection conn = new MySqlConnection(conexion);
+            conn.Open();
+
+            string query = "UPDATE CREDITO SET estado = 'Aprobado' where id_credito = @id";
+
+            MySqlCommand mycomand = new MySqlCommand(query, conn);
+            mycomand.Parameters.AddWithValue("@id", id);
+
+            int rowsaffected = mycomand.ExecuteNonQuery();
+
+            conn.Close();
+            return rowsaffected;
+            
+
+        }
+
+        public int RechazarCredito(string id)
+        {
+
+
+            string conexion = "server=remotemysql.com;database=jOXtL7Pjql;uid=jOXtL7Pjql;pwd=ecjOPpQQ8e;";
+            MySqlConnection conn = new MySqlConnection(conexion);
+            conn.Open();
+
+            string query = "UPDATE CREDITO SET estado = 'Rechazado' where id_credito = @id";
+
+            MySqlCommand mycomand = new MySqlCommand(query, conn);
+            mycomand.Parameters.AddWithValue("@id", id);
+
+            int rowsaffected = mycomand.ExecuteNonQuery();
+
+            conn.Close();
+            return rowsaffected;
+
+
+        }
     }
 }
