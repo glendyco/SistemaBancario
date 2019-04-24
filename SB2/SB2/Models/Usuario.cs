@@ -26,6 +26,12 @@ namespace SB2.Models
             return false;
         }
 
+        public string getRol() {
+            if (rol.Equals("1")) return "Administrador";
+            return "Usuario";
+        }
+
+
         public string getCuenta( )
         {
             return consulta.getCuenta(id_usuario);
