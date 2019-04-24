@@ -142,8 +142,8 @@ namespace SB2.Models
 
         public int AprobarCredito(string id)
         {
-
-
+            AbonarCredito(id);
+            
             string conexion = "server=remotemysql.com;database=jOXtL7Pjql;uid=jOXtL7Pjql;pwd=ecjOPpQQ8e;";
             MySqlConnection conn = new MySqlConnection(conexion);
             conn.Open();
@@ -156,9 +156,32 @@ namespace SB2.Models
             int rowsaffected = mycomand.ExecuteNonQuery();
 
             conn.Close();
+
+
             return rowsaffected;
             
 
+        }
+
+        public int AbonarCredito(string id) {
+            //UPDATE CUENTA SET SALDO = saldo + (SELECT monto from CREDITO WHERE id_credito= 6)
+            // WHERE id_cuenta =  (SELECT id_cuenta from CREDITO WHERE id_credito = 6)
+
+            string conexion = "server=remotemysql.com;database=jOXtL7Pjql;uid=jOXtL7Pjql;pwd=ecjOPpQQ8e;";
+            MySqlConnection conn = new MySqlConnection(conexion);
+            conn.Open();
+
+            string query = "UPDATE CUENTA SET SALDO = saldo + (SELECT monto from CREDITO WHERE id_credito= @id) WHERE id_cuenta =  (SELECT id_cuenta from CREDITO WHERE id_credito = @id)";
+
+            MySqlCommand mycomand = new MySqlCommand(query, conn);
+            mycomand.Parameters.AddWithValue("@id", id);
+
+            int rowsaffected = mycomand.ExecuteNonQuery();
+
+            conn.Close();
+
+
+            return rowsaffected;
         }
 
         public int RechazarCredito(string id)
