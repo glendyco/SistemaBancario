@@ -76,6 +76,47 @@ namespace SB2.Models
 
         }
 
+
+        public int CrearCuenta(string id_usuario) {
+            string conexion = "server=remotemysql.com;database=jOXtL7Pjql;uid=jOXtL7Pjql;pwd=ecjOPpQQ8e;";
+            MySqlConnection conn = new MySqlConnection(conexion);
+            conn.Open();
+
+            string query = "INSERT INTO CUENTA(saldo, id_usuario) " +
+                "VALUES (0,@userid)";
+            
+            MySqlCommand mycomand = new MySqlCommand(query, conn);
+        
+            mycomand.Parameters.AddWithValue("@userid", id_usuario);
+           
+            int rowsaffected = mycomand.ExecuteNonQuery();
+
+            conn.Close();
+            return rowsaffected;
+        }
+        public string getCuenta(string id_Usuario) {
+            string conexion = "server=remotemysql.com;database=jOXtL7Pjql;uid=jOXtL7Pjql;pwd=ecjOPpQQ8e;";
+            MySqlConnection conn = new MySqlConnection(conexion);
+            conn.Open();
+
+            string query = "Select id_cuenta From CUENTA Where id_usuario = @id ";
+
+            MySqlCommand mycomand = new MySqlCommand(query, conn);
+            mycomand.Parameters.AddWithValue("@id", id_Usuario);
+        
+
+            MySqlDataReader myreader = mycomand.ExecuteReader();
+
+
+            if (myreader.Read())
+            {
+                string id_cuenta = myreader["id_cuenta"].ToString();
+                return id_cuenta;
+            }
+            myreader.Close();
+            return "SIN CUENTA BANCARIA";
+        }
+
         public int SolicitarCredito(string monto, string descripcion, string cuenta)
         {
             // devuelve 1 si el registro es exitoso

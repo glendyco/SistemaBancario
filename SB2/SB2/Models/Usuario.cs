@@ -26,6 +26,11 @@ namespace SB2.Models
             return false;
         }
 
+        public string getCuenta( )
+        {
+            return consulta.getCuenta(id_usuario);
+        }
+
 
         
 

@@ -51,13 +51,26 @@ namespace SB2.Controllers
             if (resultadoRegistro == 1)
             {
                 Console.WriteLine("USUARIO REGISTRADO");
-                return View("Login");
+            
+                Models.Usuario usuario_logeado = consulta.Login(usuario, pass);
+               
+                if (usuario_logeado != null)
+                {
+                    // Console.WriteLine("USUARIO LOGUEADO ES NULO");
+                    usuario_logeado.consulta.CrearCuenta(usuario_logeado.id_usuario);
+                    Session["LoggedUser"] = usuario_logeado;
+                    Session["SolicitudesC"] = consulta.VerSolicitudesCredito();
+                    return View("UserProfile", usuario_logeado);
+                }
+               
+
             }
-            else
-            {
+           
+
                 ViewData["MensajeError"] = "Error en Registro";
                 return View("Registro");
-            }
+            
+
 
         }
 

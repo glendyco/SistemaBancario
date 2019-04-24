@@ -40,7 +40,10 @@
 
 <h2>@ViewBag.Title.</h2>
 <h3>Bienvenido @user_name </h3>
-<h3> Username: @user_nick </h3>
+<h3> USERNAME: @user_nick </h3>
+<h3> CODIGO DE USUARIO: @Model.id_usuario </h3>
+<h3> NO. CUENTA: @Model.getCuenta() </h3>
+
 <BR><BR><BR>
 
 @if (!Model.isAdmin())
@@ -85,7 +88,7 @@ else
             <th>Aprobar </th>
             <th>Rechazar </th>
 
-<tr>
+        <tr>
             @foreach (var item in Model.consulta.VerSolicitudesCredito())
             {
 
@@ -136,7 +139,7 @@ else
 
 
 
-}
+    }
 
 
 
