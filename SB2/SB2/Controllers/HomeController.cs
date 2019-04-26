@@ -170,11 +170,11 @@ namespace SB2.Controllers
 
 
         [HttpPost]
-        public ActionResult Autenticacion(string nick, string password)
+        public ActionResult Autenticacion(string code, string nick, string password)
         {
             Console.WriteLine("autenticando nick, pwd " + nick + "," + password);
             Models.Consulta consulta = new Models.Consulta();
-            Models.Usuario usuario_logeado = consulta.Login(nick, password);
+            Models.Usuario usuario_logeado = consulta.Login(code, nick, password);
 
 
             if (usuario_logeado != null)
@@ -216,6 +216,28 @@ namespace SB2.Controllers
 
         }
 
+
+        [HttpPost]
+        public ActionResult Debito(string cuenta, string descripcion, string monto)
+        {
+
+            Models.Consulta consulta = new Models.Consulta();
+
+            int resultadoRegistro = consulta.TransferenciaEjecutar(cuenta, "100100100", monto, "PAGO CRÉDITO - "+descripcion);
+
+
+            if (resultadoRegistro == 1)
+            {
+                Console.WriteLine("TRANSFERENCIA REALIZADA");
+                return View("UserProfile", (Models.Usuario)Session["LoggedUser"]);
+            }
+            else
+            {
+                ViewData["MensajeError"] = "Error en Registro";
+                return View("UserProfile", (Models.Usuario)Session["LoggedUser"]);
+            }
+
+        }
 
 
 

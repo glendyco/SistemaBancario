@@ -26,38 +26,55 @@
             background-color: #76c1da;
         }
 </style>
-<h2>EstadoCuenta</h2>
-
-<div>
-    <h4>CUENTA: @cuenta</h4>
-    <h4>SALDO ACTUAL: @Model.consulta.getSaldo(cuenta)</h4>
-    <hr />
-    <dl class="dl-horizontal"></dl>
-</div>
 
 
-<h1> HISTORIAL DE TRANSACCIONES </h1>
+<script type="text/javascript">
 
-<TABLE class="Tabla">
-
-    <tr>
-        <th>TIPO </th>
-        <th>Descripción </th>
-        <th>Monto </th>
-        <th>Cuenta</th>
-        <th>Fecha </th>
-
-    <tr>
-        @foreach(var item in Model.consulta.VerHistorial(cuenta)) 
-        {
-
-    <tr>
-        <td>@item.tipo</td>
-        <td>@item.descripcion</td>
-        <td>@item.monto</td>
-        <td>@item.cuenta_tercero</td>
-        <td>@item.fecha</td>
-
-    </tr>
+    function PrintDiv() {
+        var divToPrint = document.getElementById('printarea');
+        var popupWin = window.open('', '_blank', 'width=300,height=400,location=no,left=200px');
+        popupWin.document.open();
+        popupWin.document.write('<html><body onload="window.print()">' + divToPrint.innerHTML + '</html>');
+        popupWin.document.close();
     }
-    </TABLE>
+</script>
+
+<div id="printarea">
+    <h2>EstadoCuenta</h2>
+
+    <div>
+        <h4>CUENTA: @cuenta</h4>
+        <h4>SALDO ACTUAL: @Model.consulta.getSaldo(cuenta)</h4>
+        <hr />
+        <dl class="dl-horizontal"></dl>
+    </div>
+
+
+
+    <h1> HISTORIAL DE TRANSACCIONES </h1>
+
+    <TABLE class="Tabla">
+
+        <tr>
+            <th>TIPO </th>
+            <th>Descripción </th>
+            <th>Monto </th>
+            <th>Cuenta</th>
+            <th>Fecha </th>
+
+        <tr>
+            @foreach (var item in Model.consulta.VerHistorial(cuenta))
+            {
+
+            <tr>
+                <td>@item.tipo</td>
+                <td>@item.descripcion</td>
+                <td>@item.monto</td>
+                <td>@item.cuenta_tercero</td>
+                <td>@item.fecha</td>
+
+            </tr>
+        }
+        </TABLE>
+    </div>
+    <input id="btnprint" type="button" onclick="PrintDiv()" value="IMPRIMIR" />

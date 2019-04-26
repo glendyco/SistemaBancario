@@ -7,17 +7,18 @@ namespace SB2.Models
 {
     public class Usuario
     {
-       public string nombre, username, id_usuario, rol;
+       public string nombre, username, id_usuario, rol,codigo;
         public Consulta consulta = new Consulta();
 
 
-        public Usuario ( string nom, string user, string id, string id_rol)
+        public Usuario ( string nom, string user, string id, string id_rol,string codigo_usuario)
         {
 
             nombre = nom;
             username = user;
             id_usuario = id;
             rol = id_rol;
+            codigo = codigo_usuario;
         }
 
 

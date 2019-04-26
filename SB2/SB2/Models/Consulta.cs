@@ -11,7 +11,7 @@ namespace SB2.Models
     public class Consulta
     {
 
-        public Usuario Login(string username, string pass)
+        public Usuario Login(string codigo, string username, string pass)
         {
            
                 Usuario logged_usr = null;
@@ -20,14 +20,15 @@ namespace SB2.Models
                 MySqlConnection conn = new MySqlConnection(conexion);
                 conn.Open();
 
-                string query = "Select * From USUARIO Where username = @username AND contrasena = @pass";
+                string query = "Select * From USUARIO Where username = @username AND contrasena = @pass AND codigo=@codigo";
 
                 MySqlCommand mycomand = new MySqlCommand(query, conn);
                 mycomand.Parameters.AddWithValue("@username", username);
                 mycomand.Parameters.AddWithValue("@pass", pass);
+                mycomand.Parameters.AddWithValue("@codigo", codigo);
 
 
-                MySqlDataReader myreader = mycomand.ExecuteReader();
+            MySqlDataReader myreader = mycomand.ExecuteReader();
 
 
                 if (myreader.Read())
@@ -35,14 +36,50 @@ namespace SB2.Models
                     string usr_nick = myreader["username"].ToString();
                     string usr_nam = myreader["nombre"].ToString();
                     string usr_id = myreader["id_usuario"].ToString();
+                    string usr_cod = myreader["codigo"].ToString();
                     string usr_rol = myreader["id_rol"].ToString();
 
-                    logged_usr = new Usuario(usr_nam, usr_nick, usr_id, usr_rol);
+                    logged_usr = new Usuario(usr_nam, usr_nick, usr_id, usr_rol,usr_cod);
 
                 }
                 myreader.Close();
                 return logged_usr;
             
+        }
+
+        public Usuario Login( string username, string pass)
+        {
+
+            Usuario logged_usr = null;
+
+            string conexion = "server=remotemysql.com;database=jOXtL7Pjql;uid=jOXtL7Pjql;pwd=ecjOPpQQ8e;";
+            MySqlConnection conn = new MySqlConnection(conexion);
+            conn.Open();
+
+            string query = "Select * From USUARIO Where username = @username AND contrasena = @pass ";
+
+            MySqlCommand mycomand = new MySqlCommand(query, conn);
+            mycomand.Parameters.AddWithValue("@username", username);
+            mycomand.Parameters.AddWithValue("@pass", pass);
+        
+
+
+            MySqlDataReader myreader = mycomand.ExecuteReader();
+
+
+            if (myreader.Read())
+            {
+                string usr_nick = myreader["username"].ToString();
+                string usr_nam = myreader["nombre"].ToString();
+                string usr_id = myreader["codigo"].ToString();
+                string usr_rol = myreader["id_rol"].ToString();
+
+                logged_usr = new Usuario(usr_nam, usr_nick, usr_id, usr_rol,usr_id);
+
+            }
+            myreader.Close();
+            return logged_usr;
+
         }
 
 
@@ -243,25 +280,29 @@ namespace SB2.Models
         }
 
         public int AbonarCredito(string id) {
-            //UPDATE CUENTA SET SALDO = saldo + (SELECT monto from CREDITO WHERE id_credito= 6)
-            // WHERE id_cuenta =  (SELECT id_cuenta from CREDITO WHERE id_credito = 6)
-
+                 
             string conexion = "server=remotemysql.com;database=jOXtL7Pjql;uid=jOXtL7Pjql;pwd=ecjOPpQQ8e;";
             MySqlConnection conn = new MySqlConnection(conexion);
-            conn.Open();
+            try {
+                conn.Open();
 
-            string query = "UPDATE CUENTA SET SALDO = saldo + (SELECT monto from CREDITO WHERE id_credito= @id) WHERE id_cuenta =  (SELECT id_cuenta from CREDITO WHERE id_credito = @id)";
+                string query = "UPDATE CUENTA SET SALDO = saldo + (SELECT monto from CREDITO WHERE id_credito= @id) WHERE id_cuenta =  (SELECT id_cuenta from CREDITO WHERE id_credito = @id)";
 
-            MySqlCommand mycomand = new MySqlCommand(query, conn);
-            mycomand.Parameters.AddWithValue("@id", id);
+                MySqlCommand mycomand = new MySqlCommand(query, conn);
+                mycomand.Parameters.AddWithValue("@id", id);
 
-            int rowsaffected = mycomand.ExecuteNonQuery();
+                int rowsaffected = mycomand.ExecuteNonQuery();
 
-            conn.Close();
-
-
-            return rowsaffected;
-        }
+                conn.Close();
+                HistorialCredito(id);
+                return rowsaffected;
+            } catch (Exception e)
+            {
+                return 0;
+            }
+            
+            
+            }
 
         public int RechazarCredito(string id)
         {
@@ -468,6 +509,47 @@ namespace SB2.Models
                 conn.Close();
                 if (rowsaffected == 1) { return 1; }
                 return 0;
+
+            }
+            catch (Exception e)
+            {
+                return 0;
+            }
+
+        }
+
+
+        public int HistorialCredito(string id)
+        {
+
+            string conexion = "server=remotemysql.com;database=jOXtL7Pjql;uid=jOXtL7Pjql;pwd=ecjOPpQQ8e;";
+            MySqlConnection conn = new MySqlConnection(conexion);
+            try
+            {
+                conn.Open();
+
+                string query = "SELECT * FROM CREDITO WHERE id_credito = @id";
+                MySqlCommand mycomand = new MySqlCommand(query, conn);
+                mycomand.Parameters.AddWithValue("@id", id);
+
+                MySqlDataReader myreader = mycomand.ExecuteReader();
+
+                string cuenta = null;
+                string descripcion = null;
+                string monto = null;
+
+                if (myreader.Read())
+                {   cuenta = myreader["id_cuenta"].ToString();
+                    descripcion = myreader["descripcion"].ToString();
+                    monto = myreader["monto"].ToString();
+                }
+                myreader.Close();
+                conn.Close();
+
+                if (cuenta != null && descripcion != null && monto != null) {
+                    Historial(cuenta, "100100100",monto,"Crédito Aprobado: "+descripcion,"Crédito");
+                }
+                return 1;
 
             }
             catch (Exception e)
