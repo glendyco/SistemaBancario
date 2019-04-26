@@ -13,35 +13,35 @@ namespace SB2.Models
 
         public Usuario Login(string username, string pass)
         {
-
-            Usuario logged_usr = null;
-
-            string conexion = "server=remotemysql.com;database=jOXtL7Pjql;uid=jOXtL7Pjql;pwd=ecjOPpQQ8e;";
-            MySqlConnection conn = new MySqlConnection(conexion);
-            conn.Open();
-
-            string query = "Select * From USUARIO Where username = @username AND contrasena = @pass";
-
-            MySqlCommand mycomand = new MySqlCommand(query, conn);
-            mycomand.Parameters.AddWithValue("@username", username);
-            mycomand.Parameters.AddWithValue("@pass", pass);
-
-
-            MySqlDataReader myreader = mycomand.ExecuteReader();
            
+                Usuario logged_usr = null;
 
-           if (myreader.Read())
-            {
-                string usr_nick = myreader["username"].ToString();
-                string usr_nam = myreader["nombre"].ToString();
-                string usr_id = myreader["id_usuario"].ToString();
-                string usr_rol = myreader["id_rol"].ToString();
+                string conexion = "server=remotemysql.com;database=jOXtL7Pjql;uid=jOXtL7Pjql;pwd=ecjOPpQQ8e;";
+                MySqlConnection conn = new MySqlConnection(conexion);
+                conn.Open();
 
-                logged_usr = new Usuario(usr_nam, usr_nick, usr_id,usr_rol);
+                string query = "Select * From USUARIO Where username = @username AND contrasena = @pass";
 
-            }
-            myreader.Close();
-            return logged_usr;
+                MySqlCommand mycomand = new MySqlCommand(query, conn);
+                mycomand.Parameters.AddWithValue("@username", username);
+                mycomand.Parameters.AddWithValue("@pass", pass);
+
+
+                MySqlDataReader myreader = mycomand.ExecuteReader();
+
+
+                if (myreader.Read())
+                {
+                    string usr_nick = myreader["username"].ToString();
+                    string usr_nam = myreader["nombre"].ToString();
+                    string usr_id = myreader["id_usuario"].ToString();
+                    string usr_rol = myreader["id_rol"].ToString();
+
+                    logged_usr = new Usuario(usr_nam, usr_nick, usr_id, usr_rol);
+
+                }
+                myreader.Close();
+                return logged_usr;
             
         }
 
@@ -94,6 +94,7 @@ namespace SB2.Models
             conn.Close();
             return rowsaffected;
         }
+
         public string getCuenta(string id_Usuario) {
             string conexion = "server=remotemysql.com;database=jOXtL7Pjql;uid=jOXtL7Pjql;pwd=ecjOPpQQ8e;";
             MySqlConnection conn = new MySqlConnection(conexion);
@@ -180,6 +181,43 @@ namespace SB2.Models
 
         }
 
+        public List<Transaccion> VerHistorial(string idCuenta)
+        {
+
+
+            string conexion = "server=remotemysql.com;database=jOXtL7Pjql;uid=jOXtL7Pjql;pwd=ecjOPpQQ8e;";
+            MySqlConnection conn = new MySqlConnection(conexion);
+            conn.Open();
+
+            string query = "SELECT * FROM HISTORIAL where cuenta_principal = @id ";
+
+
+            MySqlCommand mycomand = new MySqlCommand(query, conn);
+            mycomand.Parameters.AddWithValue("@id", idCuenta);
+
+            MySqlDataReader myreader = mycomand.ExecuteReader();
+            List<Transaccion> Lista = new List<Transaccion>();
+            while (myreader.Read())
+            {
+                Transaccion transac = new Transaccion();
+                transac.tipo = myreader["tipo"].ToString();
+                transac.monto = myreader["monto"].ToString();
+                transac.descripcion = myreader["descripcion"].ToString();
+                transac.fecha = myreader["fecha"].ToString();
+                transac.cuenta_tercero = myreader["cuenta_tercero"].ToString();
+                Lista.Add(transac);
+
+                //string usr_nick = myreader["username"].ToString();
+                Console.WriteLine(myreader["descripcion"].ToString());
+
+
+            }
+            myreader.Close();
+            conn.Close();
+            return Lista;
+
+        }
+
 
         public int AprobarCredito(string id)
         {
@@ -243,6 +281,199 @@ namespace SB2.Models
             conn.Close();
             return rowsaffected;
 
+
+        }
+
+        public int TransferenciaEjecutar(string origen, string destino, string monto, string descripcion) {
+
+            //VERIFICAR SALDO SUFICIENTE
+            if (ValidarSaldo(origen, monto) == 1)
+            {
+                //DEBITAR
+                int deb = TransferenciaDebitar(origen, destino, monto);
+                //DEBITO A HISTORIAL
+                if (deb == 1)
+                {
+                    Historial(origen, destino, monto, descripcion, "Debito");
+
+                    //ABONAR
+                    int cred = TransferenciaAbonar(origen, destino, monto);
+                    //CRÉDITO A HISTORIAL
+                    if (cred == 1)
+                    {
+                        Historial(destino, origen, monto, descripcion, "Credito");
+                        return 1;
+                    }
+                }
+
+            }
+            else {
+                Console.WriteLine("saldo insuficiente");
+            }
+
+            return 0;
+        }
+
+        public int ValidarSaldo(string cuenta, string monto) {
+            string conexion = "server=remotemysql.com;database=jOXtL7Pjql;uid=jOXtL7Pjql;pwd=ecjOPpQQ8e;";
+            MySqlConnection conn = new MySqlConnection(conexion);
+            try
+            {
+                conn.Open();
+                string query = "SELECT SALDO FROM CUENTA WHERE  id_cuenta =  @cuenta";
+
+                MySqlCommand mycomand = new MySqlCommand(query, conn);
+                mycomand.Parameters.AddWithValue("@cuenta", cuenta);
+
+
+                MySqlDataReader myreader = mycomand.ExecuteReader();
+
+                string saldo = null;
+
+                if (myreader.Read())
+                {
+                    saldo = myreader["saldo"].ToString();
+                  
+                }
+                myreader.Close();
+                conn.Close();
+
+                if (saldo == null) return 0;
+
+                if (Convert.ToDouble(saldo) >= Convert.ToDouble(monto)) {
+                    return 1;
+                }
+                return 0;
+
+
+            }
+            catch (Exception e)
+            {
+                return 0;
+            }
+        }
+
+
+        public string getSaldo(string cuenta)
+        {
+            string conexion = "server=remotemysql.com;database=jOXtL7Pjql;uid=jOXtL7Pjql;pwd=ecjOPpQQ8e;";
+            MySqlConnection conn = new MySqlConnection(conexion);
+            try
+            {
+                conn.Open();
+                string query = "SELECT SALDO FROM CUENTA WHERE  id_cuenta =  @cuenta";
+
+                MySqlCommand mycomand = new MySqlCommand(query, conn);
+                mycomand.Parameters.AddWithValue("@cuenta", cuenta);
+
+
+                MySqlDataReader myreader = mycomand.ExecuteReader();
+
+                string saldo = null;
+
+                if (myreader.Read())
+                {
+                    saldo = myreader["saldo"].ToString();
+
+                }
+                myreader.Close();
+                conn.Close();
+
+                return saldo;
+
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
+
+        public int TransferenciaAbonar(string origen, string destino, string monto) {
+
+            string conexion = "server=remotemysql.com;database=jOXtL7Pjql;uid=jOXtL7Pjql;pwd=ecjOPpQQ8e;";
+            MySqlConnection conn = new MySqlConnection(conexion);
+            try
+            {
+                conn.Open();
+                string query = "UPDATE CUENTA SET SALDO = saldo + @monto WHERE id_cuenta = @destino";
+
+                MySqlCommand mycomand = new MySqlCommand(query, conn);
+                mycomand.Parameters.AddWithValue("@monto", monto);
+                mycomand.Parameters.AddWithValue("@destino", destino);
+
+                int rowsaffected = mycomand.ExecuteNonQuery();
+
+                conn.Close();
+
+                if (rowsaffected == 1) { return 1; }
+                return 0;
+              
+                
+            }
+            catch (Exception e) {
+                return 0;
+            }
+
+        }
+        public int TransferenciaDebitar(string origen, string destino, string monto)
+        {
+            string conexion = "server=remotemysql.com;database=jOXtL7Pjql;uid=jOXtL7Pjql;pwd=ecjOPpQQ8e;";
+            MySqlConnection conn = new MySqlConnection(conexion);
+            try
+            {
+                conn.Open();
+                string query = "UPDATE CUENTA SET SALDO = saldo - @monto WHERE id_cuenta = @origen";
+
+                MySqlCommand mycomand = new MySqlCommand(query, conn);
+                mycomand.Parameters.AddWithValue("@monto", monto);
+                mycomand.Parameters.AddWithValue("@origen", origen);
+
+                int rowsaffected = mycomand.ExecuteNonQuery();
+
+                conn.Close();
+
+                if (rowsaffected == 1) { return 1; }
+                return 0;
+          
+
+            }
+            catch (Exception e)
+            {
+                return 0;
+            }
+
+        }
+
+        public int Historial(string principal, string tercero, string monto, string descripcion, string tipo)
+        {
+
+            string conexion = "server=remotemysql.com;database=jOXtL7Pjql;uid=jOXtL7Pjql;pwd=ecjOPpQQ8e;";
+            MySqlConnection conn = new MySqlConnection(conexion);
+            try
+            {
+                conn.Open();
+             
+                string query = "INSERT INTO HISTORIAL(tipo, monto, descripcion, fecha, cuenta_principal, cuenta_tercero) " +
+                                "VALUES (@tipo, @monto, @descripcion,@fecha, @principal, @tercero)";
+                MySqlCommand mycomand = new MySqlCommand(query, conn);
+                mycomand.Parameters.AddWithValue("@tipo", tipo);
+                mycomand.Parameters.AddWithValue("@monto", monto);
+                mycomand.Parameters.AddWithValue("@descripcion", descripcion);
+                mycomand.Parameters.AddWithValue("@fecha", DateTime.Now);
+                mycomand.Parameters.AddWithValue("@principal", principal);
+                mycomand.Parameters.AddWithValue("@tercero", tercero);
+
+                int rowsaffected = mycomand.ExecuteNonQuery();
+
+                conn.Close();
+                if (rowsaffected == 1) { return 1; }
+                return 0;
+
+            }
+            catch (Exception e)
+            {
+                return 0;
+            }
 
         }
     }

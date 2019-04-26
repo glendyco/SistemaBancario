@@ -1,0 +1,63 @@
+﻿@model SB2.Models.Usuario
+
+@{
+    ViewBag.Title = "EstadoCuenta";
+    string cuenta = Model.getCuenta();
+}
+<style>
+    table.Tabla {
+        width: 100%;
+        background-color: #ffffff;
+        border-collapse: collapse;
+        border-width: 2px;
+        border-color: #94cced;
+        border-style: solid;
+        color: #000000;
+    }
+
+        table.Tabla td, table.Tabla th {
+            border-width: 2px;
+            border-color: #94cced;
+            border-style: solid;
+            padding: 3px;
+        }
+
+        table.Tabla thead {
+            background-color: #76c1da;
+        }
+</style>
+<h2>EstadoCuenta</h2>
+
+<div>
+    <h4>CUENTA: @cuenta</h4>
+    <h4>SALDO ACTUAL: @Model.consulta.getSaldo(cuenta)</h4>
+    <hr />
+    <dl class="dl-horizontal"></dl>
+</div>
+
+
+<h1> HISTORIAL DE TRANSACCIONES </h1>
+
+<TABLE class="Tabla">
+
+    <tr>
+        <th>TIPO </th>
+        <th>Descripción </th>
+        <th>Monto </th>
+        <th>Cuenta</th>
+        <th>Fecha </th>
+
+    <tr>
+        @foreach(var item in Model.consulta.VerHistorial(cuenta)) 
+        {
+
+    <tr>
+        <td>@item.tipo</td>
+        <td>@item.descripcion</td>
+        <td>@item.monto</td>
+        <td>@item.cuenta_tercero</td>
+        <td>@item.fecha</td>
+
+    </tr>
+    }
+    </TABLE>

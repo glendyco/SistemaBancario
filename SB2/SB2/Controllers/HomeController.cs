@@ -40,6 +40,31 @@ namespace SB2.Controllers
             return View();
         }
 
+        public ActionResult UserProfile()
+        {
+            //ViewBag.Message = "Your contact page.";
+            if (Session["LoggedUser"] != null)
+            {
+                return View("UserProfile", Session["LoggedUser"]);
+            }
+            return View("Login");
+        }
+
+        public ActionResult EstadoCuenta()
+        {
+            //ViewBag.Message = "Your contact page.";
+            return View("EstadoCuenta", Session["LoggedUser"]);
+        }
+
+        public ActionResult Logout()
+        {
+            //ViewBag.Message = "Your contact page.";
+            Session["LoggedUser"] = null;
+            return View("Login");
+        }
+
+
+
         [HttpPost]
         public ActionResult RegistroUsuario(string dpi, string nombre, string correo, string usuario, string pass)
         {
@@ -166,6 +191,32 @@ namespace SB2.Controllers
 
             
         }
+
+
+
+        [HttpPost]
+        public ActionResult Transferencia(string origen, string destino, string monto)
+        {
+
+            Models.Consulta consulta = new Models.Consulta();
+
+            int resultadoRegistro = consulta.TransferenciaEjecutar(origen, destino, monto, "Transferencia Monetaria" );
+
+
+            if (resultadoRegistro == 1)
+            {
+                Console.WriteLine("TRANSFERENCIA REALIZADA");
+                return View("UserProfile", (Models.Usuario)Session["LoggedUser"]);
+            }
+            else
+            {
+                ViewData["MensajeError"] = "Error en Registro";
+                return View("UserProfile", (Models.Usuario)Session["LoggedUser"]);
+            }
+
+        }
+
+
 
 
         public String Metodo()

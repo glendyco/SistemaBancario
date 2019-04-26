@@ -5,7 +5,7 @@
 
 
 
-    ViewBag.Title = "Perfil de Usuario";
+    ViewBag.Title = "Perfil de " + Model.getRol();
 
     string user_nick = Model.username;
     string user_name = Model.nombre;
@@ -44,6 +44,12 @@
 <h3> CODIGO DE USUARIO: @Model.id_usuario </h3>
 <h3> NO. CUENTA: @Model.getCuenta() </h3>
 
+
+<button class="btn btn-lg btn-primary" type="submit" style="background-color:black;color:white;"> @Html.ActionLink("Estado De cuenta", "EstadoCuenta") </button>
+
+
+
+
 <BR><BR><BR>
 
 @if (!Model.isAdmin())
@@ -66,6 +72,27 @@
         </div>
 
         <button class="btn btn-lg btn-primary" type="submit"> SOLICITAR </button> <BR><BR><BR>
+
+    }
+
+    using (Html.BeginForm("Transferencia", "Home", FormMethod.Post))
+    {
+        Html.AntiForgeryToken();
+        Html.ValidationSummary(true);
+
+        <h1> REALIZAR TRANSFERENCIA </h1>
+        <div class="form-group">
+            CUENTA ORIGEN <input class="form-control" type="number" name="origen" value="@Model.getCuenta()">
+        </div>
+        <div class="form-group">
+            CUENTA DESTINO  <input class="form-control" type="number" name="destino" placeholder="CUENTA DESTINO">
+        </div>
+        <div class="form-group">
+            MONTO  <input class="form-control" type="number" name="monto" placeholder="Q.">
+        </div>
+
+        <button class="btn btn-lg btn-primary" type="submit"> TRANSFERIR </button> <BR><BR><BR>
+
     }
 }
 else
