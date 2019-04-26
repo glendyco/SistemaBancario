@@ -1,7 +1,9 @@
 ﻿
 @model SB2.Models.Usuario
-
+@using System.Collections;
 @{
+
+
 
     ViewBag.Title = "Perfil de Usuario";
 
@@ -9,10 +11,138 @@
     string user_name = Model.nombre;
 
 }
+
+<!-- CSS Code: Place this code in the document's head (between the 'head' tags) -->
+<style>
+    table.Tabla {
+        width: 100%;
+        background-color: #ffffff;
+        border-collapse: collapse;
+        border-width: 2px;
+        border-color: #94cced;
+        border-style: solid;
+        color: #000000;
+    }
+
+        table.Tabla td, table.Tabla th {
+            border-width: 2px;
+            border-color: #94cced;
+            border-style: solid;
+            padding: 3px;
+        }
+
+        table.Tabla thead {
+            background-color: #76c1da;
+        }
+</style>
+
+
+
 <h2>@ViewBag.Title.</h2>
 <h3>Bienvenido @user_name </h3>
-<h3> Username: @user_nick </h3>
+<h3> USERNAME: @user_nick </h3>
+<h3> CODIGO DE USUARIO: @Model.id_usuario </h3>
+<h3> NO. CUENTA: @Model.getCuenta() </h3>
 
-<p>Sesion iniciada.</p>
+<BR><BR><BR>
+
+@if (!Model.isAdmin())
+{
+
+    using (Html.BeginForm("SolicitarCredito", "Home", FormMethod.Post))
+    {
+        Html.AntiForgeryToken();
+        Html.ValidationSummary(true);
+
+        <h1> SOLICITAR CRÉDITO </h1>
+        <div class="form-group">
+            <input class="form-control" type="number" name="monto" placeholder="MONTO">
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="text" name="descripcion" placeholder="DESCRIPCIÓN">
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="number" name="cuenta" placeholder="NUMERO DE CUENTA">
+        </div>
+
+        <button class="btn btn-lg btn-primary" type="submit"> SOLICITAR </button> <BR><BR><BR>
+    }
+}
+else
+{
+
+
+    Html.AntiForgeryToken();
+    Html.ValidationSummary(true);
+
+
+
+    <h1> APROBAR CRÉDITOS </h1>
+
+    <TABLE class="Tabla">
+
+        <tr>
+            <th>No.Cuenta </th>
+            <th>Descripción </th>
+            <th>Monto </th>
+            <th>Aprobar </th>
+            <th>Rechazar </th>
+
+        <tr>
+            @foreach (var item in Model.consulta.VerSolicitudesCredito())
+            {
+
+            <tr>
+                <td>@item.cuenta</td>
+                <td>@item.descripcion</td>
+                <td>@item.monto</td>
+                <td>
+
+                    @using (Html.BeginForm("AprobarCredito", "Home", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true)
+
+
+
+                        <div class="form-group">
+                            <input type="hidden" class="form-control" name="id_solicitud" value=" @item.id">
+                        </div>
+
+                        <button class="btn btn-lg btn-primary" type="submit"> APROBAR </button>
+                    }
+
+                </td>
+
+                <td>
+
+                    @using (Html.BeginForm("RechazarCredito", "Home", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true)
+
+
+                        <div class="form-group">
+                            <input type="hidden" class="form-control" name="id_solicitud" value=" @item.id ">
+                        </div>
+
+                        <button class="btn btn-lg btn-primary" type="submit"> RECHAZAR </button>
+                    }
+
+                </td>
+
+            </tr>
+        }
+        </TABLE>
+
+
+
+
+
+    }
+
+
+
+
 
 

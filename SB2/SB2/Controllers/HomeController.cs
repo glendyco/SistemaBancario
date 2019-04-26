@@ -51,12 +51,93 @@ namespace SB2.Controllers
             if (resultadoRegistro == 1)
             {
                 Console.WriteLine("USUARIO REGISTRADO");
-                return View("Login");
+            
+                Models.Usuario usuario_logeado = consulta.Login(usuario, pass);
+               
+                if (usuario_logeado != null)
+                {
+                    // Console.WriteLine("USUARIO LOGUEADO ES NULO");
+                    usuario_logeado.consulta.CrearCuenta(usuario_logeado.id_usuario);
+                    Session["LoggedUser"] = usuario_logeado;
+                    Session["SolicitudesC"] = consulta.VerSolicitudesCredito();
+                    return View("UserProfile", usuario_logeado);
+                }
+               
+
+            }
+           
+
+                ViewData["MensajeError"] = "Error en Registro";
+                return View("Registro");
+            
+
+
+        }
+
+
+        [HttpPost]
+        public ActionResult SolicitarCredito(string monto, string descripcion, string cuenta)
+        {
+
+            Models.Consulta consulta = new Models.Consulta();
+         
+            int resultadoRegistro = consulta.SolicitarCredito(monto, descripcion, cuenta);
+
+
+            if (resultadoRegistro == 1)
+            {
+                Console.WriteLine("CREDITO EN PROCESO");
+                return View("UserProfile",(Models.Usuario) Session["LoggedUser"] );
             }
             else
             {
                 ViewData["MensajeError"] = "Error en Registro";
-                return View("Registro");
+                return View("UserProfile", (Models.Usuario)Session["LoggedUser"]);
+            }
+
+        }
+
+
+        [HttpPost]
+        public ActionResult AprobarCredito(string id_Solicitud)
+        {
+
+            Models.Consulta consulta = new Models.Consulta();
+
+            int resultadoRegistro = consulta.AprobarCredito(id_Solicitud);
+
+
+            if (resultadoRegistro == 1)
+            {
+                
+                return View("UserProfile", (Models.Usuario)Session["LoggedUser"]);
+            }
+            else
+            {
+               
+                return View("UserProfile", (Models.Usuario)Session["LoggedUser"]);
+            }
+
+        }
+
+        [HttpPost]
+        public ActionResult RechazarCredito(string id_Solicitud)
+        {
+
+            Models.Consulta consulta = new Models.Consulta();
+
+            int resultadoRegistro = consulta.RechazarCredito(id_Solicitud);
+
+
+            if (resultadoRegistro == 1)
+            {
+
+                return View("UserProfile", (Models.Usuario)Session["LoggedUser"]);
+            }
+            else
+            {
+
+                return View("UserProfile", (Models.Usuario)Session["LoggedUser"]);
             }
 
         }
@@ -73,7 +154,10 @@ namespace SB2.Controllers
 
             if (usuario_logeado != null)
             {
-                Console.WriteLine("USUARIO LOGUEADO ES NULO");
+                // Console.WriteLine("USUARIO LOGUEADO ES NULO");
+                
+                Session["LoggedUser"] = usuario_logeado;
+                Session["SolicitudesC"] = consulta.VerSolicitudesCredito();
                 return View("UserProfile", usuario_logeado);
             }
 
