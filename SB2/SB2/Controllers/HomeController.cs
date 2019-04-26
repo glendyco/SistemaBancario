@@ -12,7 +12,6 @@ namespace SB2.Controllers
     {
         public ActionResult Index()
         {
-
             return View();
         }
 
@@ -31,10 +30,119 @@ namespace SB2.Controllers
 
         public ActionResult Login()
         {
-            ViewBag.Message = "Your contact page.";
-
+            //ViewBag.Message = "Your contact page.";
             return View();
         }
+
+        public ActionResult Registro()
+        {
+            //ViewBag.Message = "Your contact page.";
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult RegistroUsuario(string dpi, string nombre, string correo, string usuario, string pass)
+        {
+            
+            Models.Consulta consulta = new Models.Consulta();
+            int resultadoRegistro = consulta.Registro(dpi, nombre, correo, usuario, pass);
+
+
+            if (resultadoRegistro == 1)
+            {
+                Console.WriteLine("USUARIO REGISTRADO");
+            
+                Models.Usuario usuario_logeado = consulta.Login(usuario, pass);
+               
+                if (usuario_logeado != null)
+                {
+                    // Console.WriteLine("USUARIO LOGUEADO ES NULO");
+                    usuario_logeado.consulta.CrearCuenta(usuario_logeado.id_usuario);
+                    Session["LoggedUser"] = usuario_logeado;
+                    Session["SolicitudesC"] = consulta.VerSolicitudesCredito();
+                    return View("UserProfile", usuario_logeado);
+                }
+               
+
+            }
+           
+
+                ViewData["MensajeError"] = "Error en Registro";
+                return View("Registro");
+            
+
+
+        }
+
+
+        [HttpPost]
+        public ActionResult SolicitarCredito(string monto, string descripcion, string cuenta)
+        {
+
+            Models.Consulta consulta = new Models.Consulta();
+         
+            int resultadoRegistro = consulta.SolicitarCredito(monto, descripcion, cuenta);
+
+
+            if (resultadoRegistro == 1)
+            {
+                Console.WriteLine("CREDITO EN PROCESO");
+                return View("UserProfile",(Models.Usuario) Session["LoggedUser"] );
+            }
+            else
+            {
+                ViewData["MensajeError"] = "Error en Registro";
+                return View("UserProfile", (Models.Usuario)Session["LoggedUser"]);
+            }
+
+        }
+
+
+        [HttpPost]
+        public ActionResult AprobarCredito(string id_Solicitud)
+        {
+
+            Models.Consulta consulta = new Models.Consulta();
+
+            int resultadoRegistro = consulta.AprobarCredito(id_Solicitud);
+
+
+            if (resultadoRegistro == 1)
+            {
+                
+                return View("UserProfile", (Models.Usuario)Session["LoggedUser"]);
+            }
+            else
+            {
+               
+                return View("UserProfile", (Models.Usuario)Session["LoggedUser"]);
+            }
+
+        }
+
+        [HttpPost]
+        public ActionResult RechazarCredito(string id_Solicitud)
+        {
+
+            Models.Consulta consulta = new Models.Consulta();
+
+            int resultadoRegistro = consulta.RechazarCredito(id_Solicitud);
+
+
+            if (resultadoRegistro == 1)
+            {
+
+                return View("UserProfile", (Models.Usuario)Session["LoggedUser"]);
+            }
+            else
+            {
+
+                return View("UserProfile", (Models.Usuario)Session["LoggedUser"]);
+            }
+
+        }
+
+
 
         [HttpPost]
         public ActionResult Autenticacion(string nick, string password)
@@ -43,12 +151,17 @@ namespace SB2.Controllers
             Models.Consulta consulta = new Models.Consulta();
             Models.Usuario usuario_logeado = consulta.Login(nick, password);
 
-       
-            if (usuario_logeado != null) {
-                Console.WriteLine("USUARIO LOGUEADO ES NULO");
+
+            if (usuario_logeado != null)
+            {
+                // Console.WriteLine("USUARIO LOGUEADO ES NULO");
+                
+                Session["LoggedUser"] = usuario_logeado;
+                Session["SolicitudesC"] = consulta.VerSolicitudesCredito();
                 return View("UserProfile", usuario_logeado);
             }
 
+            ViewData["MensajeError"] = "Error en Autenticación";
             return View("Login");
 
             
